@@ -1,0 +1,6 @@
+__pycache__/
+data/woodblock/
+.vscode/
+taming_transformers.egg-info/
+logs/
+taming/modules/autoencoder/
