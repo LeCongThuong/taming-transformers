@@ -408,7 +408,6 @@ class Encoder(nn.Module):
 
         # timestep embedding
         temb = None
-
         # downsampling
         hs = [self.conv_in(x)]
         for i_level in range(self.num_resolutions):

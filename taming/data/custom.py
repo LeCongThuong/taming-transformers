@@ -21,16 +21,16 @@ class CustomBase(Dataset):
 
 
 class Woodblock2D(CustomBase):
-    def __init__(self, size, training_images_list_file): 
+    def __init__(self, size, images_list_file): 
         super().__init__()
-        with open(training_images_list_file, "r") as f:
+        with open(images_list_file, "r") as f:
             paths = f.read().splitlines()
         self.data = PrintPaths(paths=paths, size=size)
 
 class Woodblock3D(CustomBase):
-    def __init__(self, size, training_images_list_file): 
+    def __init__(self, size, images_list_file): 
         super().__init__()
-        with open(training_images_list_file, "r") as f:
+        with open(images_list_file, "r") as f:
             paths = f.read().splitlines()
         self.data = NumpyDepthPaths(paths=paths, size=size)
 
