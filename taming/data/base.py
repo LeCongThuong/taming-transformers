@@ -3,6 +3,8 @@ import numpy as np
 import albumentations
 from PIL import Image
 from torch.utils.data import Dataset, ConcatDataset
+from torchvision import transforms
+import torch
 
 
 class ConcatDatasetWithIndex(ConcatDataset):
@@ -57,6 +59,66 @@ class ImagePaths(Dataset):
         for k in self.labels:
             example[k] = self.labels[k][i]
         return example
+    
+
+class PrintPaths(Dataset):
+    def __init__(self, paths, size=None):
+        self.size = size
+        self.labels = dict()
+        self.labels["file_path_"] = paths
+        self._length = len(paths)
+        self.transform = transforms.Compose([transforms.ToTensor()])
+
+    def __len__(self):
+        return self._length
+
+    def preprocess_image(self, image_path):
+        """Utility function that load an image an convert to torch."""
+        # open image using OpenCV (HxWxC)
+        img = Image.open(image_path).convert('L')
+        # convert image to torch tensor (CxHxW)
+        img_t: torch.Tensor = self.transform(img)
+        return img_t
+
+    def __getitem__(self, i):
+        example = dict()
+        example["image"] = self.preprocess_image(self.labels["file_path_"][i])
+        for k in self.labels:
+            example[k] = self.labels[k][i]
+        return example
+
+class NumpyDepthPaths(Dataset):
+    def __init__(self, paths, size=None):
+        self.size = size
+
+        self.labels = dict()
+        self.labels["file_path_"] = paths
+        self._length = len(paths)
+        self.transform = transforms.Compose([transforms.ToTensor()])
+
+    def __len__(self):
+        return self._length
+
+    def preprocess_depth(self, depth_path):
+        """Utility function that load an image an convert to torch."""
+        # open image using OpenCV (HxWxC)
+        img: np.ndarray = np.load(depth_path)
+        # unsqueeze to make it 1xHxW
+        img = np.expand_dims(img, axis=0)
+        # cast type as np.float32
+        img = img.astype(np.float32)
+        # convert image to torch tensor (CxHxW)
+        img_t: torch.Tensor = torch.from_numpy(img)
+        return img_t
+
+    def __getitem__(self, i):
+        example = dict()
+        example["image"] = self.preprocess_depth(self.labels["file_path_"][i])
+        for k in self.labels:
+            example[k] = self.labels[k][i]
+        return example
+
+
 
 
 class NumpyPaths(ImagePaths):
